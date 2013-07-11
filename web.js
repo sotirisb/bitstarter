@@ -1,6 +1,6 @@
-//var fs = require('fs');
-
-//var readin = fs.readFile('./index.html');
+var fs = require('fs');
+var buffer = new Buffer( fs.readFileSync('./index.html') , "utf-8")
+console.log( buffer.toString('utf-8'));
 
 var express = require('express');
 
