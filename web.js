@@ -1,13 +1,13 @@
-var fs = require('fs');
+//var fs = require('fs');
 
-var readin = fs.readFile('./index.html');
+//var readin = fs.readFile('./index.html');
 
 var express = require('express');
 
 var app = express.createServer(express.logger());
 
 app.get('/', function(request, response) {
-  response.send(readin);
+  response.send("Hello");
 });
 
 var port = process.env.PORT || 5000;
