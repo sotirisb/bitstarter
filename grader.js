@@ -83,7 +83,7 @@ if(require.main == module) {
           else {
             //console.log(program.url + " : Good URL! \n");
             fs.writeFileSync("dump.html", result);
-            var val = checkHtmlFile("dump.html", cheks);
+            var val = JSON.stringify( checkHtmlFile("dump.html", cheks), null, 4);
             console.log(val);
           }
         };
