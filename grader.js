@@ -21,6 +21,9 @@ References:
    - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
 */
 
+/* jshint strict: false */
+/* global node:true */
+
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
@@ -61,14 +64,41 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
+
 if(require.main == module) {
     program
         .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+        .option('-u, --url <url>', 'URL to process')
         .parse(process.argv);
-    var checkJson = checkHtmlFile(program.file, program.checks);
+
+    if (program.url) { // if URL was specified
+      // I still need to study closures, even if this works...
+      rest = require('restler');
+      var buildfn = function( cheks ) {
+        var response2console = function(result, response) {
+          if (result instanceof Error) {
+            console.error('Error: ' + util.format(response.message));
+          }
+          else {
+            //console.log(program.url + " : Good URL! \n");
+            fs.writeFileSync("dump.html", result);
+            var val = checkHtmlFile("dump.html", cheks);
+            console.log(val);
+          }
+        };
+        return response2console;
+      };
+      // SB is very proud of this touch herebelow - rest.get should execute last as it is asynchronous...
+      var response2console = buildfn( program.checks );
+      rest.get( program.url ).on('complete', response2console);
+    } 
+    else { //proceed with input file
+      var checkJson = checkHtmlFile(program.file, program.checks);
+    }
+    // and produce output
     var outJson = JSON.stringify(checkJson, null, 4);
     console.log(outJson);
-} else {
+} else { // invoked as library
     exports.checkHtmlFile = checkHtmlFile;
 }
